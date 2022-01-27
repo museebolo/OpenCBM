@@ -32,6 +32,7 @@
 #define PROMICRO_7406           6
 #define MINIMUS                 7
 #define MINIMUS32               8
+#define MB_CBM_TEENSY2          9
 
 #if MODEL == USBKEY
 #include "cpu-usbkey.h"
@@ -54,6 +55,9 @@
 #elif MODEL == PROMICRO_7406
 #include "cpu-promicro.h"
 #include "board-promicro_7406.h"
+#elif MODEL == MB_CBM_TEENSY2
+#include "cpu-teensy2.h"
+#include "board-mb-cbm-teensy2.h"
 #elif MODEL == MINIMUS
 #include "cpu-minimus.h"
 #include "board-minimus.h"

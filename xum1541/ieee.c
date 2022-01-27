@@ -37,12 +37,43 @@
 #define IeeeGetBit(a)   (a & 0xf)
 #define IeeeIsPort(a,b) ((a & 0xf0) == b)
 
-#define IeeeDdr(a)      (IeeeIsPort(a,0xA0) ? &DDRA  : \
-    IeeeIsPort(a,0xC0) ? &DDRC  : IeeeIsPort(a,0xD0) ? &DDRD  : &DDRB)
+#ifdef __AVR_ATmega32U4__
+#define IeeeDdr(a)      (IeeeIsPort(a,0xA0) ? &DDRA : \
+                         IeeeIsPort(a,0xC0) ? &DDRC : \
+                         IeeeIsPort(a,0xD0) ? &DDRD : \
+                         IeeeIsPort(a,0xF0) ? &DDRF : \
+                         IeeeIsPort(a,0xE0) ? &DDRE : \
+                         &DDRB)
+
 #define IeeePort(a)     (IeeeIsPort(a,0xA0) ? &PORTA : \
-    IeeeIsPort(a,0xC0) ? &PORTC : IeeeIsPort(a,0xD0) ? &PORTD : &PORTB)
-#define IeeePin(a)      (IeeeIsPort(a,0xA0) ? PINA   : \
-    IeeeIsPort(a,0xC0) ? PINC   : IeeeIsPort(a,0xD0) ? PIND     : PINB)
+                         IeeeIsPort(a,0xC0) ? &PORTC : \
+                         IeeeIsPort(a,0xD0) ? &PORTD : \
+                         IeeeIsPort(a,0xF0) ? &PORTF : \
+                         IeeeIsPort(a,0xE0) ? &PORTE : \
+                         &PORTB)
+
+#define IeeePin(a)      (IeeeIsPort(a,0xA0) ? PINA : \
+                         IeeeIsPort(a,0xC0) ? PINC : \
+                         IeeeIsPort(a,0xD0) ? PIND : \
+                         IeeeIsPort(a,0xF0) ? PINF : \
+                         IeeeIsPort(a,0xE0) ? PINE : \
+                         PINB)
+#else
+#define IeeeDdr(a)      (IeeeIsPort(a,0xA0) ? &DDRA : \
+                         IeeeIsPort(a,0xC0) ? &DDRC : \
+                         IeeeIsPort(a,0xD0) ? &DDRD : \
+                         &DDRB)
+
+#define IeeePort(a)     (IeeeIsPort(a,0xA0) ? &PORTA : \
+                         IeeeIsPort(a,0xC0) ? &PORTC : \
+                         IeeeIsPort(a,0xD0) ? &PORTD : \
+                         &PORTB)
+
+#define IeeePin(a)      (IeeeIsPort(a,0xA0) ? PINA : \
+                         IeeeIsPort(a,0xC0) ? PINC : \
+                         IeeeIsPort(a,0xD0) ? PIND : \
+                         PINB)
+#endif
 
 #define IeeeInp(a,b)    a
 #define IeeeOut(a,b)    b
@@ -79,10 +110,13 @@
 // IEEE data lines
 #define IeeeDataDdr(port, ddr)  *(IeeeDdr(port)) = ddr
 #define IeeeDataPort(port, by)  *(IeeePort(port)) = by
-#define IeeeDataOut(by)         IeeeDataDdr(IEEE_DATA_IO, 0x00); \
-    IeeeDataPort(IEEE_DATA_IO, by);IeeeDataDdr(IEEE_DATA_IO, ~by);
-#define IeeeDataIn()            IeeeDataDdr(IEEE_DATA_IO, 0x00); \
-    IeeeDataPort(IEEE_DATA_IO, 0xff)
+
+#define IeeeDataOut(by)         IeeeDataDdr(IEEE_DATA_IO, 0x00);    \
+                                IeeeDataPort(IEEE_DATA_IO, by);     \
+                                IeeeDataDdr(IEEE_DATA_IO, ~by);
+
+#define IeeeDataIn()            IeeeDataDdr(IEEE_DATA_IO, 0x00);    \
+                                IeeeDataPort(IEEE_DATA_IO, 0xff)
 
 //
 // set output line
@@ -96,7 +130,11 @@
 #define IeeeNdac(state) IeeeSet(state, IEEE_NDAC_I, IEEE_NDAC_O)
 #define IeeeNrfd(state) IeeeSet(state, IEEE_NRFD_I, IEEE_NRFD_O)
 
+#ifndef IEEE_LED_O
 #define IeeeLED(state)  IeeeRen(state)
+#else
+#define IeeeLED(state)  IeeeSet(state, IEEE_LED_O, IEEE_LED_O)
+#endif
 
 //
 // read input line
