@@ -1,9 +1,9 @@
 include ../../include/common.mk
 
 ifeq "$(CYGWIN)" ""
-  LIBUSB_CONFIG   = libusb-config
-  CFLAGS+=-g -Wall -pedantic -std=c99 `$(LIBUSB_CONFIG) --cflags` -I ../../lib/ -I../../include/ $(CFLAGS_EXTRA)
-  LFLAGS+=$(LDFLAGS_EXTRA) `$(LIBUSB_CONFIG) --libs` -lusb
+
+  CFLAGS+=-g -Wall -pedantic -std=c99 -I ../../lib/ -I../../include/ $(CFLAGS_EXTRA)
+  LFLAGS+=$(LDFLAGS_EXTRA)
 else
   # special handling for CYGWIN:
 
@@ -23,7 +23,7 @@ LFLAGS := -L../../lib/ -lxu1541$(LIB_WIN) $(LFLAGS)
 .PHONY:	all clean mrproper xu1541lib
 
 all:
-	make ../$(APP)
+	$(MAKE) ../$(APP)
 
 clean:
 	rm -f *.o *~
@@ -35,4 +35,4 @@ mrproper: clean
 	$(CC) $(OBJS) -o $@ $(LFLAGS)
 
 xu1541lib:
-	make -C ../../lib/
+	$(MAKE) -C ../../lib/
